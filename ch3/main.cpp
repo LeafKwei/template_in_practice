@@ -8,16 +8,36 @@
 
 #include <iostream>
 
+//模板1
 template<typename T1, typename T2>
 auto max(T1 a, T2 b){
     return a < b ? b : a;  //如果返回值使用auto替代，并且没有在函数尾部使用“->”显式指定返回值类型，那么编译器将从return语句推断返回值类型
 }
 
+//模板2
 template<typename RT, typename T1, typename T2>
 RT max(T1 a, T2 b){
     return a < b ? b : a;
 }
 
 int main(void){
-    
+    /**
+     *  选用max(T1, T2)
+     *  由于模板2的RT无法从函数参数推断，而下方的调用并未显式给定RT，所以模板2不匹配
+     */
+    max(10, 20);
+
+    /**
+     *  选用RT max(T1,T2)
+     * 下方的调用给定了一个模板参数类型，该类型可能是模板1的T1，也可能是模板2的RT，由于10.2属于double，到long double需要经过一次隐式类型转换，
+     * 因此模板1会有一个额外的开销(因为T1被指定为了long double)，而模板2而由于T1、T2都从函数参数推断，因此本身就直接与函数参数兼容，无额外开销，
+     * 所以此处模板2匹配的更好
+     */
+    max<long double>(10.2, 6);
+
+    /** 
+     * 模糊错误 
+     * 模板1的T1被指定为int，而函数参数也是int，无额外开销；模板2的RT被指定为int，T1和T2从函数参数推断为int，也无额外开销，因此两者匹配的同样好
+     */
+    max<int>(10, 20);
 }
