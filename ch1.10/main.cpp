@@ -46,7 +46,7 @@ T Stack<T,Cont>::top(){
 //========================================
 /**
  * 为类型参数T指定了默认类型int，那么当我们以“Stack2<std::vector<int>>”的形式使用此模板时，由于std::vector<int>被应用于T，所以类型参数Cont
- * 没有被指定任何类型，所以无法通过编译。
+ * 没有被指定任何类型，因此无法通过编译。
  */
 template<typename T=int, typename Cont>
 class Stack2{
