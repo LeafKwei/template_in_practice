@@ -80,14 +80,14 @@ void func2(){
 /**
  * 《推断指示》
  * 在上文中，引发问题的主要原因是对const char [6]退化后的指针的处理。在此，我们可以采用另一种办法：推断指示(Deduction guides)，通过定义一个特定的推断指示，
- * 我们可以让一个模板在类型参数符合推断指示的要求时，按照指定的类型进行实例化。
+ * 我们可以让一个类模板在构造函数接收的参数的类型符合推断指示的要求时，以指定的类型进行实例化。
  */
 template <typename T>
 struct Dummy_C{
     Dummy_C(T e){}
 };
 
-/* 提示编译器，一旦T被推断为const char*，就将Dummy_C以std::string实例化 */
+/* 提示编译器，一旦Dummy_C的构造函数的接收到的参数类型是const char*，就将Dummy_C以std::string实例化 */
 Dummy_C(const char*) -> Dummy_C<std::string>;
 
 void func3(){
@@ -97,7 +97,10 @@ void func3(){
     */
     Dummy_C dummy1 = "Hello"; 
 
-    /* 以下ok */
+    /**
+     * 以下两条语句都是通过构造函数Dummy_C(T e)初始化。Dummy_C的构造函数接收的参数类型为const char*，按照推断指示，编译器会将Dummy_C
+     * 实例化为Dummy_C<std::string>。 
+     */
     Dummy_C dummy2("Hello");
     Dummy_C dummy3{"Hello"};
 }
