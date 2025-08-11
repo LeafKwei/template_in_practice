@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+//========================================
 /**
  * 《非类型类模板参数》
  * 在本例中我们将演示如何对类模板使用非类型参数，我们将前面的Stack类改造为一个使用固定大小数组来保存元素的实现。就像定义旧版本的Stack一样，我们使用template
@@ -45,7 +46,7 @@ void Stack<T,Size>::pop(){
     if(m_index > 0) --m_index;
 }
 
-int main(void){
+void func1(){
     Stack<int, 16> i16Stack;       //将Size指定为16，编译器将实例化一个数组容量为16的Stack版本
     Stack<int, 32> i32Stack;       //将Size指定为32，编译器将实例化一个数组容量为32的Stack版本
 
@@ -55,4 +56,26 @@ int main(void){
      */
     std::cout << typeid(i16Stack).name() << std::endl;
     std::cout << typeid(i32Stack).name() << std::endl;
+}
+
+//========================================
+/**
+ * 《非类型函数模板参数》
+ * 非类型模板参数也可用于函数模板，例如，下方的函数模板声明了一个非类型参数Val，通过在调用该模板时指定不同的值，我们就可以实例化出为参数e增加不同
+ * 值的addValue版本。
+ */
+template<int Val, typename T>
+T addValue(const T e){
+    return e + Val;
+}
+
+void func2(){
+    int e = 10;
+    std::cout << addValue<5>(e) << std::endl;    //实例化一个为e增加5的addValue版本
+    std::cout << addValue<10>(e) << std::endl; //实例化一个为e增加10的addValue版本
+}
+
+int main(void){
+    func1();
+    func2();
 }
