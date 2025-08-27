@@ -33,7 +33,7 @@ void print(const T &arg1, const Types... args){
     print(args...);
 }
 
-void fun1(){
+void func1(){
     /**
      * 1.对于传递的参数(9.9, "Hello", std::string("World"))，对print的调用将展开为print<double, const char*, std::string>(9.9, "Hello", std::string("World"))，随后，参数列表
      *   中的首个参数将传递到print模板的第一个参数arg1，而剩余的参数则被收集到参数包args中。(注：如果参数包前还存在一个函数参数arg2，那么参数列表中的第二个参数将
@@ -42,8 +42,8 @@ void fun1(){
      *   传递给arg1，而剩余参数再次收集到参数包args中。
      * 3.对于递归调用时传递的参数(std::string("World"))，对print的调用将展开为print<std::string>(std::string("World"))，此时参数std::string("World")被消耗，传递给arg1，
      *   由于没有剩余的参数，所以参数包args现在为空。
-     * 4.对于最后一次递归调用print，由于参数包为空，所以调用被展开为print()，此时由于与print模板重载的print函数也能匹配此次调用，并且按函数匹配规则而言，普通的print
-     *   函数匹配地更好，因此C++编译器将选择普通的print函数，递归也在此时终止。
+     * 4.对于最后一次递归调用print，由于参数包为空，所以调用被展开为print()，由于print的模板版本需要参数，所以它不匹配该调用，因此编译器将选择我们的无参pirint函数，
+     *   递归也到此为止。
      */
     print(9.9, "Hello", std::string("World"));
 }
@@ -51,10 +51,62 @@ void fun1(){
 //================================
 /**
  * 《重载的可变和非可变参数模板》
- * P92
+ * 对于上面的例子，我们也可以选择定义一个非可变参数模板版本的print2函数模板来结束递归，其原理是当两个模板都匹配一个调用时，没有尾随参数包的版本匹配的更好，因此
+ * 当递归进行到最后一个参数时，编译器会选择我们的非可变参数版本，递归也就随之结束。
  */
+template<typename T>
+void print2(const T &arg){
+    std::cout << arg << std::endl;
+}
+
+template<typename T, typename... Types>
+void print2(const T &arg1, const Types... args){
+    std::cout << arg1 << std::endl;
+    print2(args...);
+}
+
+void func2(){
+    print(9.9, "Hello", std::string("World"));
+}
+
+//================================
+/**
+ * 《操作符sizeof...》
+ * C++11中还引入了一个用于可变参数模板的sizeof操作符的新形式，即“sizeof...”，它可以用于计算模板参数包(如typename... Types)和函数参数包(如const Types... &args)内
+ * 的参数数量。
+ */
+template<typename... Types>
+void counter(const Types... args){
+    std::cout << sizeof...(Types) << std::endl;
+    std::cout << sizeof...(args) << std::endl;
+}
+
+void func3(){
+    counter(1, 3.4, 8U, std::string("Hello World!"), "C++ Templates!");
+}
+
+/**
+ * 但是，不要指望可以通过sizeof...来检查参数数量的方式来终止可变参数模板的递归，这是因为if语句工作在运行时，而模板代码的生成则是在编译时进行，所以
+ * 即使无参版本的print3不会被调用，但编译器却无法在编译时得知，所以依旧照常寻找无参版本的print3，而如果我们没有提供无参的print3，那么就会产生编译
+ * 错误。
+ */
+template<typename T, typename... Types>
+void print3(const T &arg1, const Types... args){
+    std::cout << arg1 << std::endl;
+    if(sizeof...(args) > 0){
+        print3(args...);
+    }
+
+    /* 在C++17中，随着if constexpr的出现，if语句可以在编译时期执行，所以以下方式是正确的。 */
+    #if 0
+    if constexpr (sizeof...(args) > 0){
+        print3(args...);
+    }
+    #endif
+}
 
 int main(void){
-
-   
+    func1();
+    func2();
+    func3();
 }
