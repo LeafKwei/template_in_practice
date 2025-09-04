@@ -5,6 +5,7 @@
  */
 
 #include <iostream>
+#include <vector>
 
 //================================
 /* 参数包args出现在操作符左侧且右侧操作数空缺 */
@@ -44,8 +45,19 @@ void func1(){
 }
 
 //================================
+/* 由于此处需要使用到索引值而非类型，因此要使用非类型模板参数Idx。为了避免编译器将我们传递给Idx的索引值当作类型参数，需要将Idx放到类型参数C的前边 */
+template<std::size_t... Idx, typename C>
+void printIndic(const C &container){
+    /* 可变索引，即将下标操作符结合参数包使用，展开后将得到与参数包的参数数量一致的一组下标表达式 */
+    print(container[Idx]...);
+}
 
+void func2(){
+    /* 通过在每次调用printIndic时给出不同的索引值作为非模板参数包，实现每次调用打印容器中的不同元素 */
+    printIndic<0, 2, 4>(std::vector<std::string>{"A", "B", "C", "D", "E"});  //展开为print(container[0], container[2], container[4])
+}
 
 int main(void){
     func1();
+    func2();
 }
