@@ -27,4 +27,5 @@ ch3.5: .template结构和通用lambda
 ch3.6: 变量模板
 
 ch4.1: 完美转发(Perfect forwarding)
-ch4.2: 
+ch4.2: 特殊成员函数的模板 
+ch4.3:
